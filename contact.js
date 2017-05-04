@@ -2,6 +2,7 @@
 
 const program = require('commander');
 const { prompt } = require('inquirer');
+require('dotenv').config()
 
 const { 
   addContact, 
@@ -9,7 +10,8 @@ const {
   addMultipleContacts, 
   getContactList,
   updateContact,
-  deleteContact  
+  deleteContact,
+  sendEmailToContact 
 } = require('./logic'); 
 
 const questions = [
@@ -34,6 +36,19 @@ const questions = [
     message : 'Contact\'s email address ..'
   }
 
+];
+
+const sendEmailQuestions = [
+  {
+    type : 'input',
+    name : 'subject',
+    message : 'Subject ...'
+  }, 
+  {
+    type : 'input',
+    name : 'message',
+    message : 'Message/Body ...'
+  }
 ];
 
 program
@@ -76,9 +91,18 @@ program
   .description('List contacts')
   .action(() => getContactList());
 
+program
+  .command('sendEmail <_id>')
+  .alias('s')
+  .description('Send email to contact')
+  .action(_id => {
+    prompt(sendEmailQuestions).then((answers) => 
+      sendEmailToContact(_id, answers));
+  });
+
 
 // Assert that a VALID command is provided 
-if (!process.argv.slice(2).length || !/[arudl]/.test(process.argv.slice(2))) {
+if (!process.argv.slice(2).length || !/[arudls]/.test(process.argv.slice(2))) {
   program.outputHelp();
   process.exit();
 }
